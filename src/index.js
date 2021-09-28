@@ -247,9 +247,7 @@ DB.query('SELECT * FROM users WHERE mail = ?',[mail],(err,rows,fields)=>{
 app.post('/login', async(req, res) => {
     let mail = req.body.user
     let pass = req.body.password
-    let password = await bcryptjs.hash(pass,8)
-    console.log(req.body)
-   
+    let password = await bcryptjs.hash(pass,8) 
     DB.query('SELECT * FROM users WHERE mail = ?',[mail],async(err,rows,fields)=>{
   //se comprueba el usuario
             if (rows.length == 0) {

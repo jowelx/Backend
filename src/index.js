@@ -11,9 +11,9 @@ const uuid = require('uuid');
 const cloudinary = require('cloudinary');
 const bcryptjs = require('bcryptjs');
 cloudinary.config({
-    cloud_name:'dfaaqkh9d',
-    api_key:'932154441455112',
-    api_secret:'zilTZZg1lFFju8rEOK7tYfKeBvo',
+    cloud_name:process.env.CLOUD_NAME,
+    api_key:process.env.API_KEY,
+    api_secret:process.env.API_SECRET,
     secure: true
 })
 const session = require('express-session');
@@ -57,7 +57,6 @@ function uploadFileMultiple(){
  const upload = multer({storage:storage}).array('file');
 return upload
 }
-
 //routes
 app.get('/',(req,res)=>{
    DB.query('SELECT * FROM products',(err,rows,fields)=>{
@@ -127,7 +126,6 @@ app.get('/user',(req,res)=>{
   res.json(user)
 
 })
-
  function  Msqlinsert(TABLE, VALUES){
    return new Promise((resolve,reject)=>{
      

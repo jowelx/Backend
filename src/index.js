@@ -21,7 +21,7 @@ app.use(session({
 	secret: 'secret',
   cookie: { 
     maxAge : new Date(Date.now() + 36000000), //10 Hour 
-    expires : new Date(Date.now() + 36000000), //10 
+    expires : new Date(Date.now() + 36000000), //10 Hour
    },
 	resave: false,
 	saveUninitialized: false,

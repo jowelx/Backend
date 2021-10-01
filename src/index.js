@@ -27,6 +27,7 @@ app.use(session({
 	saveUninitialized: false,
   name:""
 }));
+
 //variable de session del usuario
 let name = 'no registrado';
 //varable se sseion de administrador

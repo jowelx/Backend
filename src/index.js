@@ -10,6 +10,7 @@ const multer = require('multer');
 const uuid = require('uuid');
 const cloudinary = require('cloudinary');
 const bcryptjs = require('bcryptjs');
+//configuracion del storage
 cloudinary.config({
     cloud_name:process.env.CLOUD_NAME,
     api_key:process.env.API_KEY,
@@ -17,6 +18,7 @@ cloudinary.config({
     secure: true
 })
 const session = require('express-session');
+//configuracion de las coockies
 app.use(session({
 	secret: 'secret',
   cookie: { 
@@ -35,8 +37,7 @@ let admin = 'sin sesion';
 app.set('port', process.env.PORT || 4000)
 //middlewares
 app.use(morgan('dev'))
-app.use(express.urlencoded({extended:true}));
-//app.use(express.json());
+app.use(express.urlencoded({extended:false}));
 app.use(express.json({limit: '500mb'}));
 app.use(cors());
 app.use(express.urlencoded({limit: '500mb'}));
@@ -53,11 +54,12 @@ function uploadFileMultiple(){
             cb(null,parseInt(id)+ uuid.v4() + extension);
         }
     })
-
- const upload = multer({storage:storage}).array('file');
+ const upload = multer({storage:storage}).array('image');
 return upload
 }
 //routes
+
+//cargar todos los productos
 app.get('/',(req,res)=>{
    DB.query('SELECT * FROM products',(err,rows,fields)=>{
   if(!err){
@@ -105,6 +107,7 @@ app.get('/',(req,res)=>{
 })
 
 })
+//cargar un producto en concreto
 app.get('/product/:id',(req,res)=>{
   
        let product = req.params
@@ -121,39 +124,25 @@ app.get('/product/:id',(req,res)=>{
         console.log(result)
         })
        })
-     })
+})
+//cargar usuario logeado
 app.get('/user',(req,res)=>{
   res.json(user)
-
 })
- function  Msqlinsert(TABLE, VALUES){
-   return new Promise((resolve,reject)=>{
-     
-   DB.query('INSERT INTO '+ [TABLE] + ' SET ?', VALUES), (err,results )=>{
-        //const result = await 
-        if(err){
-           console.log(err)
-           return reject(err)
-         }
-          return resolve(4545)
-          
-         
-         
-     
-     }
-    
-   })
- }
- app.post('/prueba',async(req,res)=>{
-  const result=Msqlinsert('prueba', {xd :"4444444444444"})
-  console.log(result)
+//ruta de pruebas
+app.post('/prueba',uploadFileMultiple(),async(req,res)=>{
+  console.log( req.data)
+
+ //cloudinary.v2.uploader.upload(req.body.file, function (error, result){console.log(result)
+//})
  })
+//publicar producto
 app.post('/upload',uploadFileMultiple(),async(req,res)=>{
     console.log(req.body.data)
 
     
-     id = Math.random()*100000000000
-        let indice =0
+        id = Math.random()*100000000000
+        let indice = 0
         let files = req.body.file
         let name_product = req.body.data.name_product
         let description_product = req.body.data.description
@@ -173,16 +162,16 @@ app.post('/upload',uploadFileMultiple(),async(req,res)=>{
                }
               else{
                 indice += 1
-                Msqlinsert('images' ,{url:result.url,
+                Msqlinsert('images' ,{path:result.url,
                   Id_product:parseInt(id)
                  })
                 if(indice == files.length){
                 cloudinary.v2.uploader.upload(img_principal, function (error, results){
             
               console.log(result)
-            
+
                     Msqlinsert('products' ,{
-                      product_name:name_product,
+                        product_name:name_product,
                         description_product:description_product,
                         id_images_product: parseInt(id),
                         price:price,
@@ -207,6 +196,7 @@ app.post('/upload',uploadFileMultiple(),async(req,res)=>{
      //MsqlInsert(images, )
     
 })
+//registrar usuario
 app.post('/register', async(req,res)=>{
     const mail = req.body.mail;
     const pass = req.body.password;
@@ -242,6 +232,44 @@ DB.query('SELECT * FROM users WHERE mail = ?',[mail],(err,rows,fields)=>{
 
 }) 
 })
+//borrar producto
+app.post('/delete/:id', async(req,res)=>{
+  let product = req.params
+ DB.query("DELETE FROM products WHERE id = ?",[product.id],(err,results)=>{
+   if(!err){
+res.send('ok')
+   }
+   else(
+     console.log(err)
+   )
+})
+})
+//actualizar productos
+app.post('/upload/:id',async(req,res)=>{
+  console.log(req.body)
+  let file = req.body.file[0].portada
+  console.log(file)
+  let id= req.body.file[0].id
+    product_name=req.body.data.name_product,
+    description_product=req.body.data.description,
+    price=req.body.data.price,
+    year=req.body.data.year,
+    model=req.body.data.model,
+    state=req.body.data.state,
+    brand=req.body.data.brand,
+    amount=req.body.data.amount,
+  
+    cloudinary.v2.uploader.upload(file, function (error, results){
+  DB.query("UPDATE products SET product_name = '"+product_name+"', description_product ='"+description_product+"', price ='"+price+"', year ='"+year+"', model ='"+model+"', state ='"+state+"', brand ='"+brand+"', amount ='"+amount+"', portada ='"+results.url+"' WHERE id = "+id,async(err,result)=>{
+  if(err){
+  console.log(err)
+  }else{
+    res.send('ok')
+  }
+    })
+  })
+})
+//inicio de session
 app.post('/login', async(req, res) => {
     let mail = req.body.user
     let pass = req.body.password
@@ -251,21 +279,36 @@ app.post('/login', async(req, res) => {
             if (rows.length == 0) {
               res.send("user");
             }
-        
             //se comprueba la contraseña
              else if (!(await bcryptjs.compare(pass, rows[0].password))) {
                res.send("pass");
              } else{
               req.session.loggedin = true;
               req.session.name = rows[0].user;
-
                user = req.session.name
                res.send({type:"succesClient", user: user} )
              }
-
     })
   });
-  app.use(function(req, res, next) {
+function  Msqlinsert(TABLE, VALUES){
+    return new Promise((resolve,reject)=>{
+      
+    DB.query('INSERT INTO '+ [TABLE] + ' SET ?', VALUES), (err,results )=>{
+         //const result = await 
+         if(err){
+            console.log(err)
+            return reject(err)
+          }
+           return resolve(4545)
+           
+          
+          
+      
+      }
+     
+    })
+  }
+app.use(function(req, res, next) {
     if (!req.user)
         res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     next();

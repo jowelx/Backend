@@ -1,5 +1,5 @@
 require('dotenv').config();
-let user = ""
+let user = "Joel"
 let productId
 const express = require('express');
 const app = express();
@@ -58,7 +58,73 @@ function uploadFileMultiple() {
   return upload
 }
 //routes
+app.get('/comments/:id',async(req,res)=>{
+  let id= req.params
+  let comments=[]
+  let indice=0
+  let coment
+  let response
+ 
+  DB.query('SELECT  * FROM comments WHERE id_product = ?',[id.id],(err,rows)=>{
+    rows.forEach(function(field,index){
+      DB.query('SELECT  * FROM answer WHERE id_coment = ?',[field.id],(err,fields)=>{
+         if(err){
 
+           console.log(err)
+         }else{
+        coment = field
+        response = fields
+        comments.push({coment,response})
+     
+          indice +=1
+        
+          if(indice === rows.length){
+            res.json(comments)
+          }
+        }
+    })
+  })
+})
+})
+//notificacion de comentarios
+app.post('/updateComments/:id',async(req,res)=>{
+  let id= req.params
+  let comments=[]
+  let indice=0
+  let coment
+  let response
+  let com =0
+ 
+  DB.query("UPDATE products SET comments = '"+ com+ " 'WHERE id = " +id.id,(err,rows)=>{
+    if(err){
+      console.log(err)
+    }else{
+      console.log("puta notificacion")
+      DB.query('SELECT  * FROM comments WHERE id_product = ?',[id.id],(err,rows)=>{
+   
+        rows.forEach(function(field,index){
+          DB.query('SELECT  * FROM answer WHERE id_coment = ?',[field.id],(err,fields)=>{
+             if(err){
+    
+               console.log(err)
+             }else{
+            coment = field
+            response = fields
+            comments.push({coment,response})
+         
+              indice +=1
+            
+              if(indice === rows.length){
+                res.json(comments)
+              }
+            }
+        })
+      })
+    })
+    }
+    })
+
+})
 //cargar todos los productos
 app.get('/', (req, res) => {
   DB.query('SELECT * FROM products', (err, rows, fields) => {
@@ -129,14 +195,109 @@ app.get('/cart', (req, res) => {
     }
   })
 })
-//ruta de pruebas
-app.post('/prueba', uploadFileMultiple(), async (req, res) => {
-  console.log(req.data)
+//ruta para cargar las novedades
+app.get('/news',(req,res)=>{
+  DB.query('SELECT * FROM news',async(err,result)=>{
 
+    if(err){
+      console.log(err)
+    }
+
+  
+    else{
+      console.log(result)
+      res.json(result)
+  }
+  })
+})
+app.post('/answers',async(req,res)=>{
+ 
+  let values ={
+    id_coment:req.body.data.id_comment,
+    comment:req.body.data.comment,
+    user:user
+  }
+  console.log(values)
+ DB.query('INSERT INTO answer SET  ?',values,async(err,result)=>{
+if(err){
+  console.log(err)
+}else{
+  res.send("ok")
+}
+  })
+   
+})
+//ruta de pruebas
+app.get('/prueba', uploadFileMultiple(), async (req, res) => {
+
+  DB.query('SELECT comments FROM products WHERE id ='+ 58,async(err,fields)=>{
+console.log(fields[0].comments)
+  })
   //cloudinary.v2.uploader.upload(req.body.file, function (error, result){console.log(result)
   //})
 })
+//publicar novedades
+app.post('/news',uploadFileMultiple(),async(req,res)=>{
+  let files = req.body.file
+  let indice = 0
+  let values={}
+  console.log(files)
 
+  DB.query('SELECT * FROM news',async(err,result)=>{
+if(result.length>0){
+  DB.query("DELETE FROM news ", async(err, results) => {
+    if (!err) {
+      res.send('ok')
+    }
+    else {
+      await files.forEach(function (file, index) {
+        cloudinary.v2.uploader.upload(file.url, function (error, result) {
+          if(error){
+            console.log(error)
+          }else{
+            indice += 1
+            values ={url: result.url}
+            DB.query('INSERT INTO news SET  ?',values,async(err,result)=>{
+    if(err){
+      console.log(err)
+    }
+            })
+            if(indice === files.length){
+              res.send("ok")
+            }
+         
+          }
+        })
+      
+      })
+    }
+  })
+}else{
+  await files.forEach(function (file, index) {
+    cloudinary.v2.uploader.upload(file.url, function (error, result) {
+      if(error){
+        console.log(error)
+      }else{
+        indice += 1
+        values ={url: result.url}
+        DB.query('INSERT INTO news SET  ?',values,async(err,result)=>{
+if(err){
+  console.log(err)
+}
+        })
+        if(indice === files.length){
+          res.send("ok")
+        }
+     
+      }
+    })
+  
+  })
+}
+
+  })
+
+})
 //publicar producto
 app.post('/upload', uploadFileMultiple(), async (req, res) => {
   console.log(req.body.data)
@@ -187,27 +348,52 @@ app.post('/upload', uploadFileMultiple(), async (req, res) => {
   //MsqlInsert(images, )
 
 })
-app.get('/comments/:id',async(req,res)=>{
-  let id= req.params
-  console.log(id.id)
-  DB.query('SELECT  * FROM comments WHERE id_product = ?',[id.id],(err,rows)=>{
-    res.json(rows)
-  })
-})
+//agregar comentarios
 app.post('/comments',async(req,res)=>{
 
   console.log(req.body.data.user)
- 
+ let com = 0
   let values ={
     user :req.body.data.user,
     id_product:req.body.data.id_product,
-    comment:req.body.data.comments
+    comment:req.body.data.comments,
+    revised: "false"
   }
-  
+  DB.query('SELECT comments FROM products WHERE id ='+values.id_product,async(err,fields)=>{
+    console.log(fields[0].comments)
+    com =fields[0].comments +1
+    DB.query("UPDATE products SET comments = '"+ com + "'WHERE id = '" + values.id_product+"'",(err,rows)=>{
+if(err){
+  console.log(err)
+}else{ 
   DB.query('INSERT INTO comments SET ?', values, async (err, results) => {
-res.send("ok")
+    res.send("ok")
+      })
+}
+
+    })
   })
 
+ 
+ 
+
+})
+///countComents
+app.get('/countComents',async(req,res)=>{
+  let count =0
+  let indice=0
+  DB.query('SELECT comments FROM products',async(err,fields)=>{
+  
+   fields.forEach(function(item){
+     indice +=1
+count+= item.comments
+console.log(count)
+if(indice === fields.length){
+  res.json(count)
+}
+
+   })
+      })
 })
 //restablecer contraseña
 app.post('/restore',async(req,res)=>{
@@ -360,7 +546,9 @@ app.post('/update/:id', async (req, res) => {
       })
     })
 })
-
+app.post('/notification/:id',async(req,res)=>{
+  console.log(req.params.id)
+})
 //inicio de session
 app.post('/login', async (req, res) => {
   let mail = req.body.user
@@ -380,7 +568,6 @@ app.post('/login', async (req, res) => {
       user = req.session.name
       res.send({ type: "succesClient", user: user })
     }
-  
   })
 });
 function Msqlinsert(TABLE, VALUES) {

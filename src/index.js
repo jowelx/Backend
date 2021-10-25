@@ -17,16 +17,17 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
   secure: true
 })
+
 const session = require('express-session');
 //configuracion de las coockies
 app.use(session({
   secret: 'secret',
+  saveUninitialized: true,
   cookie: {
-    maxAge: new Date(Date.now() + 36000000), //10 Hour 
-    expires: new Date(Date.now() + 36000000), //10 Hour 
+    maxAge: 360000, //10 Hour 000000
+  //10 Hour 
   },
   resave: false,
-  saveUninitialized: false,
   name: ""
 }));
 //variable de session del usuario
@@ -64,20 +65,16 @@ app.get('/comments/:id',async(req,res)=>{
   let indice=0
   let coment
   let response
- 
   DB.query('SELECT  * FROM comments WHERE id_product = ?',[id.id],(err,rows)=>{
     rows.forEach(function(field,index){
       DB.query('SELECT  * FROM answer WHERE id_coment = ?',[field.id],(err,fields)=>{
          if(err){
-
            console.log(err)
          }else{
         coment = field
         response = fields
-        comments.push({coment,response})
-     
+        comments.push({coment,response})     
           indice +=1
-        
           if(indice === rows.length){
             res.json(comments)
           }
@@ -94,8 +91,8 @@ app.post('/updateComments/:id',async(req,res)=>{
   let coment
   let response
   let com =0
- 
-  DB.query("UPDATE products SET comments = '"+ com+ " 'WHERE id = " +id.id,(err,rows)=>{
+
+  DB.query("UPDATE products SET comments = '"+ com+ "'WHERE id = " +id.id,(err,rows)=>{
     if(err){
       console.log(err)
     }else{
@@ -122,7 +119,7 @@ app.post('/updateComments/:id',async(req,res)=>{
       })
     })
     }
-    })
+    })//
 
 })
 //cargar todos los productos
@@ -210,6 +207,7 @@ app.get('/news',(req,res)=>{
   }
   })
 })
+//gerstion de respuestas
 app.post('/answers',async(req,res)=>{
  
   let values ={
@@ -246,8 +244,8 @@ app.post('/news',uploadFileMultiple(),async(req,res)=>{
   DB.query('SELECT * FROM news',async(err,result)=>{
 if(result.length>0){
   DB.query("DELETE FROM news ", async(err, results) => {
-    if (!err) {
-      res.send('ok')
+    if (err) {
+      console.log(err)
     }
     else {
       await files.forEach(function (file, index) {
@@ -271,7 +269,7 @@ if(result.length>0){
       
       })
     }
-  })
+  }) 
 }else{
   await files.forEach(function (file, index) {
     cloudinary.v2.uploader.upload(file.url, function (error, result) {
@@ -301,8 +299,6 @@ if(err){
 //publicar producto
 app.post('/upload', uploadFileMultiple(), async (req, res) => {
   console.log(req.body.data)
-
-
   id = Math.random() * 100000000000
   let indice = 0
   let files = req.body.file
@@ -314,18 +310,15 @@ app.post('/upload', uploadFileMultiple(), async (req, res) => {
   let state = req.body.data.state
   let brand = req.body.data.brand
   let amount = req.body.data.amount
+  let category = req.body.data.category
   console.log(files)
 
   await files.forEach(function (file, index) {
-    cloudinary.v2.uploader.upload(file.path, function (error, result) {
+    cloudinary.v2.uploader.upload(file.path,{timeout:12000000} , (error, result)=> {
       if (error) {
         console.log(error)
       }
       else {
-        
-      
-      
-
             console.log(result)
             Msqlinsert('products', {
               product_name: name_product,
@@ -337,6 +330,7 @@ app.post('/upload', uploadFileMultiple(), async (req, res) => {
               state: state,
               brand: brand,
               amount: amount,
+              category:category,
               portada: result.url
             })
             res.send("ok")
@@ -351,16 +345,22 @@ app.post('/upload', uploadFileMultiple(), async (req, res) => {
 //agregar comentarios
 app.post('/comments',async(req,res)=>{
 
-  console.log(req.body.data.user)
- let com = 0
+
+  console.log("id del producto a comentar"+req.body.data.id_product)
+  let com = 0
   let values ={
     user :req.body.data.user,
     id_product:req.body.data.id_product,
     comment:req.body.data.comments,
     revised: "false"
   }
+  if(user == "admin"){
+    DB.query('INSERT INTO comments SET ?', values, async (err, results) => {
+      res.send("ok")
+        })
+  }else{
   DB.query('SELECT comments FROM products WHERE id ='+values.id_product,async(err,fields)=>{
-    console.log(fields[0].comments)
+   
     com =fields[0].comments +1
     DB.query("UPDATE products SET comments = '"+ com + "'WHERE id = '" + values.id_product+"'",(err,rows)=>{
 if(err){
@@ -370,13 +370,11 @@ if(err){
     res.send("ok")
       })
 }
+    
 
     })
   })
-
- 
- 
-
+}
 })
 ///countComents
 app.get('/countComents',async(req,res)=>{
@@ -386,6 +384,7 @@ app.get('/countComents',async(req,res)=>{
   
    fields.forEach(function(item){
      indice +=1
+
 count+= item.comments
 console.log(count)
 if(indice === fields.length){
@@ -399,7 +398,7 @@ if(indice === fields.length){
 app.post('/restore',async(req,res)=>{
   let pass = req.body.pass
   let email = req.body.email
-  let password = await bcryptjs.hash(pass, 8)
+  let password = await bcryptjs.hash(pass, 12)
   console.log(email)
   DB.query('SELECT * FROM users WHERE mail =? ',[email],(err,rows)=>{
   let User = rows[0].user
@@ -433,7 +432,7 @@ app.post('/register', async (req, res) => {
   const pass = req.body.password;
   const user = req.body.user;
   const name_user = req.body.name
-  let password = await bcryptjs.hash(pass, 8)
+  let password = await bcryptjs.hash(pass, 12)
   const values = {
     name: name_user,
     user: user,
@@ -527,7 +526,7 @@ app.post('/update/:id', async (req, res) => {
   let file = req.body.file[0].portada
   console.log(file)
   let id = req.body.file[0].id
-  product_name = req.body.data.name_product,
+    product_name = req.body.data.name_product,
     description_product = req.body.data.description,
     price = req.body.data.price,
     year = req.body.data.year,
@@ -535,9 +534,9 @@ app.post('/update/:id', async (req, res) => {
     state = req.body.data.state,
     brand = req.body.data.brand,
     amount = req.body.data.amount,
-
+    category = req.body.data.category
     cloudinary.v2.uploader.upload(file, function (error, results) {
-      DB.query("UPDATE products SET product_name = '" + product_name + "', description_product ='" + description_product + "', price ='" + price + "', year ='" + year + "', model ='" + model + "', state ='" + state + "', brand ='" + brand + "', amount ='" + amount + "', portada ='" + results.url + "' WHERE id = " + id, async (err, result) => {
+      DB.query("UPDATE products SET product_name = '" + product_name + "', description_product ='" + description_product + "', price ='" + price + "', year ='" + year + "', model ='" + model + "', state ='" + state + "', brand ='" + brand + "', amount ='" + amount + "',category ='"+category+"' , portada ='" + results.url + "' WHERE id = " + id, async (err, result) => {
         if (err) {
           console.log(err)
         } else {
@@ -546,6 +545,7 @@ app.post('/update/:id', async (req, res) => {
       })
     })
 })
+//indica cuantos comentarios hay en cada producto
 app.post('/notification/:id',async(req,res)=>{
   console.log(req.params.id)
 })
@@ -553,7 +553,7 @@ app.post('/notification/:id',async(req,res)=>{
 app.post('/login', async (req, res) => {
   let mail = req.body.user
   let pass = req.body.password
-  let password = await bcryptjs.hash(pass, 8)
+  let password = await bcryptjs.hash(pass, 12)
   DB.query('SELECT * FROM users WHERE mail = ?', [mail], async (err, rows, fields) => {
     //se comprueba el usuario
     if (rows.length == 0) {
@@ -570,6 +570,10 @@ app.post('/login', async (req, res) => {
     }
   })
 });
+//cerrar session
+app.post('/loguot',(req,res)=>{
+user ="";
+})
 function Msqlinsert(TABLE, VALUES) {
   return new Promise((resolve, reject) => {
 

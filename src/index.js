@@ -98,7 +98,7 @@ app.post('/updateComments/:id',async(req,res)=>{
     }else{
       console.log("puta notificacion")
       DB.query('SELECT  * FROM comments WHERE id_product = ?',[id.id],(err,rows)=>{
-   
+   if(rows.length >0){
         rows.forEach(function(field,index){
           DB.query('SELECT  * FROM answer WHERE id_coment = ?',[field.id],(err,fields)=>{
              if(err){
@@ -112,14 +112,22 @@ app.post('/updateComments/:id',async(req,res)=>{
               indice +=1
             
               if(indice === rows.length){
+                console.log("puta notificacion x2")
+                console.log(comments)
                 res.json(comments)
+           
               }
             }
         })
       })
-    })
+    }else{
+      res.send("undefined")
+    }})
+  
     }
-    })//
+  
+    }
+  )//
 
 })
 //cargar todos los productos
@@ -525,7 +533,7 @@ app.post('/update/:id', async (req, res) => {
   console.log(req.body)
   let file = req.body.file[0].portada
   console.log(file)
-  let id = req.body.file[0].id
+  let id = req.params.id
     product_name = req.body.data.name_product,
     description_product = req.body.data.description,
     price = req.body.data.price,
@@ -539,6 +547,7 @@ app.post('/update/:id', async (req, res) => {
       DB.query("UPDATE products SET product_name = '" + product_name + "', description_product ='" + description_product + "', price ='" + price + "', year ='" + year + "', model ='" + model + "', state ='" + state + "', brand ='" + brand + "', amount ='" + amount + "',category ='"+category+"' , portada ='" + results.url + "' WHERE id = " + id, async (err, result) => {
         if (err) {
           console.log(err)
+          console.log(req.params)
         } else {
           res.send('ok')
         }
@@ -570,6 +579,7 @@ app.post('/login', async (req, res) => {
     }
   })
 });
+
 //cerrar session
 app.post('/loguot',(req,res)=>{
 user ="";

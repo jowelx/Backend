@@ -30,6 +30,7 @@ app.use(session({
   resave: false,
   name: ""
 }));
+//husg
 //variable de session del usuario
 let name = 'no registrado';
 //varable se sseion de administrador

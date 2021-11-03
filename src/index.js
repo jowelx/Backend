@@ -66,21 +66,27 @@ app.get('/comments/:id',async(req,res)=>{
   let coment
   let response
   DB.query('SELECT  * FROM comments WHERE id_product = ?',[id.id],(err,rows)=>{
-    rows.forEach(function(field,index){
-      DB.query('SELECT  * FROM answer WHERE id_coment = ?',[field.id],(err,fields)=>{
-         if(err){
-           console.log(err)
-         }else{
-        coment = field
-        response = fields
-        comments.push({coment,response})     
-          indice +=1
-          if(indice === rows.length){
-            res.json(comments)
+    if(rows.length >0){
+      rows.forEach(function(field,index){
+        DB.query('SELECT  * FROM answer WHERE id_coment = ?',[field.id],(err,fields)=>{
+           if(err){
+             console.log(err)
+           }else{
+          coment = field
+          response = fields
+          comments.push({coment,response})     
+            indice +=1
+            if(indice === rows.length){
+              res.json(comments)
+            }
           }
-        }
+      })
     })
-  })
+    }
+    else{
+      console.log("putoooooooooooo")
+      res.json({che:"404"})
+    }
 })
 })
 //notificacion de comentarios
@@ -102,7 +108,6 @@ app.post('/updateComments/:id',async(req,res)=>{
         rows.forEach(function(field,index){
           DB.query('SELECT  * FROM answer WHERE id_coment = ?',[field.id],(err,fields)=>{
              if(err){
-    
                console.log(err)
              }else{
             coment = field
@@ -115,7 +120,7 @@ app.post('/updateComments/:id',async(req,res)=>{
                 console.log("puta notificacion x2")
                 console.log(comments)
                 res.json(comments)
-           
+        
               }
             }
         })
@@ -482,6 +487,7 @@ app.post('/delete/:id', async (req, res) => {
     )
   })
 })
+
 //borrar producto de la lista del usuario
 app.post('/deleteCart/:id', async (req, res) => {
   let product = req.params
@@ -579,7 +585,6 @@ app.post('/login', async (req, res) => {
     }
   })
 });
-
 //cerrar session
 app.post('/loguot',(req,res)=>{
 user ="";

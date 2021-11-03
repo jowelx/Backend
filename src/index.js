@@ -1,6 +1,6 @@
 // "startDev": "nodemon src/index.js"
 require('dotenv').config();
-let user = "Joel"
+let user = ""
 let productId
 const express = require('express');
 const app = express();

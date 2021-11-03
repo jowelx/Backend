@@ -207,7 +207,7 @@ app.get('/cart', (req, res) => {
 
     }
     else{
-      res.send(404)
+      res.json([])
     }
 
   })

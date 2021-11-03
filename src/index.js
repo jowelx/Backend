@@ -183,28 +183,33 @@ app.get('/cart', (req, res) => {
   let indice = 0
 
   DB.query('SELECT * FROM shopping_cart WHERE user = ?', [user], (err, result) => {
-    if (err) {
-      console.log(err)
-    }
-    else {
-      result.forEach(function (file, index) {
-        DB.query('SELECT * FROM products WHERE id = ?', [file.id_product], (err, results) => {
-          indice += 1
-          
-          products.push({
-            results,
-            amount: file.amount
+    if(result.length>0){
+      if (err) {
+        console.log(err)
+      }
+      else {
+        result.forEach(function (file, index) {
+          DB.query('SELECT * FROM products WHERE id = ?', [file.id_product], (err, results) => {
+            indice += 1
+            
+            products.push({
+              results,
+              amount: file.amount
+            })
+            if (indice === result.length) {
+  
+              res.json(products)
+            }
           })
-          if (indice === result.length) {
-
-            res.json(products)
-
-          }
         })
-
-      })
+  
+      }
 
     }
+    else{
+      res.send(404)
+    }
+
   })
 })
 //ruta para cargar las novedades

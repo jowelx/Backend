@@ -346,7 +346,9 @@ app.post('/upload', uploadFileMultiple(), async (req, res) => {
               brand: brand,
               amount: amount,
               category:category,
-              portada: result.url
+              portada: result.url,
+              comments:0
+
             })
             res.send("ok")
             indice = 0

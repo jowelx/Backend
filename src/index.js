@@ -181,7 +181,10 @@ app.get('/cart', (req, res) => {
   let like = 0
   let products = []
   let indice = 0
-
+if(user=""){
+  res.json([])
+}
+else{
   DB.query('SELECT * FROM shopping_cart WHERE user = ?', [user], (err, result) => {
     if(result.length>0){
       if (err) {
@@ -211,6 +214,9 @@ app.get('/cart', (req, res) => {
     }
 
   })
+
+}
+
 })
 //ruta para cargar las novedades
 app.get('/news',(req,res)=>{

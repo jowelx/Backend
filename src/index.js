@@ -42,6 +42,17 @@ app.set('port', process.env.PORT || 4000)
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: '500mb' }));
+
+const whitelist =["direccionipekisde"]
+const options ={
+  origin:(origin,callback)=>{
+    if(whitelist.includes(origin)||!origin){
+      callback(null,true)
+    }else{
+      callback(new error("unauthorized"))
+    }
+  }
+}
 app.use(cors());
 app.use(express.urlencoded({ limit: '500mb' }));
 //function

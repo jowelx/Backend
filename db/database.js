@@ -8,6 +8,7 @@ const connect =  mysql.createConnection({
 connect.connect(function(err){
     if(err){
         console.log(err);
+        setTimeout(handleDisconnect, 2000);
        return
     }else{
         console.log('Db connect')

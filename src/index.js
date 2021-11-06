@@ -53,6 +53,9 @@ const options ={
     }
   }
 }
+setInterval(function () {
+DB.query('SELECT 1');
+}, 5000);
 app.use(cors());
 app.use(express.urlencoded({ limit: '500mb' }));
 //function
@@ -513,7 +516,6 @@ app.post('/delete/:id', async (req, res) => {
     )
   })
 })
-
 //borrar producto de la lista del usuario
 app.post('/deleteCart/:id', async (req, res) => {
   let product = req.params

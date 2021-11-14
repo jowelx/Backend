@@ -43,7 +43,7 @@ app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: '500mb' }));
 
-const whitelist =["direccionipekisde"]
+const whitelist =["https://leyla-front.herokuapp.com/dashboard/0"]
 const options ={
   origin:(origin,callback)=>{
     if(whitelist.includes(origin)||!origin){
@@ -56,7 +56,7 @@ const options ={
 setInterval(function () {
 DB.query('SELECT 1');
 }, 5000);
-app.use(cors());
+app.use(cors(options));
 app.use(express.urlencoded({ limit: '500mb' }));
 //function
 let idIMG
@@ -436,6 +436,7 @@ if(indice === fields.length){
    })
       })
 })
+
 //restablecer contraseña
 app.post('/restore',async(req,res)=>{
   let pass = req.body.pass

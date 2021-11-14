@@ -43,7 +43,7 @@ app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: '500mb' }));
 
-const whitelist =["https://leyla-front.herokuapp.com/dashboard/0"]
+const whitelist =["https://leyla-front.herokuapp.com/"]
 const options ={
   origin:(origin,callback)=>{
     if(whitelist.includes(origin)||!origin){

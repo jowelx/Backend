@@ -43,13 +43,13 @@ app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: '500mb' }));
 
-const whitelist =["https://leyla-front.herokuapp.com/"]
+const whitelist =["https://leyla-front.herokuapp.com/","byldsc6eg4toh0pgbowc-mysql.services.clever-cloud.com"]
 const options ={
   origin:(origin,callback)=>{
-    if(whitelist.includes(origin)||!origin){
+    if(whitelist.includes(origin)/*||!origin*/){
       callback(null,true)
     }else{
-      callback(new error("unauthorized"))
+      callback("unauthorized")
     }
   }
 }
@@ -152,7 +152,7 @@ app.post('/updateComments/:id',async(req,res)=>{
 
 })
 //cargar todos los productos
-app.get('/', (req, res) => {
+app.get('/',(req, res) => {
   DB.query('SELECT * FROM products', (err, rows, fields) => {
     if (!err) {
 

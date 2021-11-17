@@ -56,7 +56,7 @@ const options ={
 setInterval(function () {
 DB.query('SELECT 1');
 }, 5000);
-app.use(cors(options));
+app.use(cors(/*options*/));
 app.use(express.urlencoded({ limit: '500mb' }));
 //function
 let idIMG

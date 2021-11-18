@@ -1,7 +1,9 @@
 // "startDev": "nodemon src/index.js"
 require('dotenv').config();
 let user = ""
+let secret = process.env.SECRET
 let productId
+const jwt=require('jsonwebtoken');
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
@@ -603,6 +605,7 @@ app.post('/login', async (req, res) => {
     if (rows.length == 0) {
       res.send("user");
     }
+    
     //se comprueba la contraseña
     else if (!(await bcryptjs.compare(pass, rows[0].password))) {
       res.send("pass");
@@ -610,7 +613,13 @@ app.post('/login', async (req, res) => {
       req.session.loggedin = true;
       req.session.name = rows[0].user;
       user = req.session.name
-      res.send({ type: "succesClient", user: user })
+      const payload={
+        sub:1,
+        role:"consumer"
+      }
+       
+      const token =jwt.sign(payload,secret)
+      res.send({ type: "succesClient", user: user ,token})
     }
   })
 });

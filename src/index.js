@@ -30,7 +30,7 @@ app.use(session({
     maxAge: 360000, //10 Hour 000000
   //10 Hour 
   },
-  resave: false,
+  resave: true,
   name: ""
 }));
 //husg
@@ -612,7 +612,7 @@ app.post('/login', async (req, res) => {
     } else {
       req.session.loggedin = true;
       req.session.name = rows[0].user;
-      user = req.session.name
+      user =  rows[0].user
       const payload={
         sub:1,
         role:"consumer"

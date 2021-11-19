@@ -191,8 +191,8 @@ app.get('/user', (req, res) => {
   res.json(user)
 })
 //productos que el usuario agrego al carrito
-app.get('/cart', (req, res) => {
-
+app.get('/cart/:user', (req, res) => {
+  let user = req.params.user
   let cart = 0
   let like = 0
   let products = []
@@ -338,6 +338,7 @@ if(err){
   })
 
 })
+
 //publicar producto
 app.post('/upload', uploadFileMultiple(), async (req, res) => {
   console.log(req.body.data)

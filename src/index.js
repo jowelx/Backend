@@ -13,6 +13,7 @@ const multer = require('multer');
 const uuid = require('uuid');
 const cloudinary = require('cloudinary');
 const bcryptjs = require('bcryptjs');
+const Stripe =require('stripe')
 //configuracion del storage
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -20,7 +21,7 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
   secure: true
 })
-
+const stripe=new Stripe(process.env.STRIPE);
 const session = require('express-session');
 //configuracion de las coockies
 app.use(session({
@@ -207,7 +208,6 @@ app.get('/cart/:user', (req, res) => {
         result.forEach(function (file, index) {
           DB.query('SELECT * FROM products WHERE id = ?', [file.id_product], (err, results) => {
             indice += 1
-            
             products.push({
               results,
               amount: file.amount
@@ -436,7 +436,23 @@ if(indice === fields.length){
    })
       })
 })
+//pasarela de pago
+app.post('/payment',async(req,res)=>{
+try{
+  const {id,amount}=req.body
+  const payment=await stripe.paymentIntents.create({
+  amount,
+  currency:"USD",
+  id_shop:id,
+  payment_method:id,
+  confirm:true
+  })
+  res.send({message:'Succesfull payment'})
+}catch(e){
+  console.log(e)
+}
 
+})
 //restablecer contraseña
 app.post('/restore',async(req,res)=>{
   let pass = req.body.pass

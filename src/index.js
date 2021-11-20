@@ -77,6 +77,7 @@ function uploadFileMultiple() {
   const upload = multer({ storage: storage }).array('image');
   return upload
 }
+
 //routes
 app.get('/comments/:id',async(req,res)=>{
   let id= req.params
@@ -335,7 +336,6 @@ if(err){
   })
 
 })
-
 //publicar producto
 app.post('/upload', uploadFileMultiple(), async (req, res) => {
   console.log(req.body.data)
@@ -438,18 +438,65 @@ if(indice === fields.length){
 })
 //pasarela de pago
 app.post('/payment',async(req,res)=>{
+  const {id,amount,user}=req.body
+  const relativeDate=new Date()
+  const fecha= `${relativeDate.getDate()}/${relativeDate.getMonth()+1}/${relativeDate.getFullYear()}`
 try{
-  const {id,amount}=req.body
+
+
+ 
   const payment=await stripe.paymentIntents.create({
   amount,
   currency:"USD",
-  id_shop:id,
+  description:id,
   payment_method:id,
   confirm:true
   })
+
+  console.log(payment)
+  console.log("monto:"+amount)
+  console.log(user)
+
+  DB.query('SELECT * FROM shopping_cart WHERE user = ?',[user],async(err,rows)=>{
+      if(err){
+        console.log(err)
+      }else{
+        rows.map(item=>{
+
+          DB.query('SELECT * FROM products WHERE id = ?',[item.id_product],async(err,rows)=>{ 
+
+            let VALUES={
+              user:user,
+              id_product:item.id_product,
+              amount:item.amount,
+              price:rows[0].price,
+              time:fecha
+          }
+DB.query('INSERT INTO sell SET ?',VALUES,(err,result)=>{
+if(err){
+  console.log(err)
+}else{
+  console.log(fecha)
+  DB.query("DELETE FROM shopping_cart WHERE user = ?", [user], (err, results) => {
+if(err){
+  console.log(err)
+}else{
   res.send({message:'Succesfull payment'})
+}
+  })
+ 
+}
+})
+           })
+    
+        })
+      }
+
+  })
+
 }catch(e){
   console.log(e)
+  console.log("monto:"+amount)
 }
 
 })

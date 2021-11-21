@@ -173,11 +173,16 @@ app.get("/seler",(req,res)=>{
     
   rows.map((item,index)=>{
     DB.query('SELECT * FROM sell WHERE time = ?',[item.time],(err,rows)=>{
-items.push(rows)
-if(index == rows.length-1){
-fecha.push([item.time,items])
-res.json(fecha)
-}
+      if(err){
+        console.log(err)
+      }else{
+        items.push(rows)
+        if(index == rows.length-1){
+        fecha.push([item.time,items])
+        res.json(fecha)
+        }
+      }
+
     })
   })
   })

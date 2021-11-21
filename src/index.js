@@ -179,7 +179,7 @@ app.get("/seler",(req,res)=>{
       }else{
        
         row.map((ite,index)=>{
-          DB.query('SELECT portada FROM products WHERE id = ?',[ite.id_product],(err,roww)=>{
+          DB.query('SELECT portada,product_name FROM products WHERE id = ?',[ite.id_product],(err,roww)=>{
             items.push({ite,roww})
             if(index == row.length-1){
               fecha.push({time:item.time,items})

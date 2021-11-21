@@ -177,11 +177,12 @@ app.get("/seler",(req,res)=>{
       if(err){
         console.log(err)
       }else{
-        items.push(row)
+       
         row.map(ite=>{
           DB.query('SELECT portada FROM products WHERE id = ?',[ite.id_product],(err,roww)=>{
+            items.push(row,roww)
             if(index == rows.length-1){
-              fecha.push({time:item.time,items,roww})
+              fecha.push({time:item.time,items})
               res.json(fecha)
               }
           })

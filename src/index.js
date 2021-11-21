@@ -167,10 +167,19 @@ app.get('/',(req, res) => {
 })
 app.get("/seler",(req,res)=>{
   const fecha = []; 
+  const items =[]
   DB.query('SELECT DISTINCT time FROM sell',(err,rows)=>{
   
-    res.json(rows)
-  
+    
+  rows.map((item,index)=>{
+    DB.query('SELECT * FROM sell WHERE time = ?',[item.time],(err,rows)=>{
+items.push(rows)
+if(index == rows.length-1){
+fecha.push([item.time,items])
+res.json(fecha)
+}
+    })
+  })
   })
 })
 //selled

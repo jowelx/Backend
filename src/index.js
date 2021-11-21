@@ -159,18 +159,27 @@ app.post('/updateComments/:id',async(req,res)=>{
 app.get('/',(req, res) => {
   DB.query('SELECT * FROM products', (err, rows, fields) => {
     if (!err) {
-
- 
-     
       res.json( rows);
-
-
-
     } else {
       console.log(err)
     }
   })
-
+})
+//selled
+app.get("/selled",(req,res)=>{
+  const sell =[]
+  DB.query('SELECT * FROM sell',(err,rows)=>{
+rows.map(item=>{
+  DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, rows, fields) => {
+    if(err){
+      console.log(err)
+    }else{
+        sell.push(item,item.portada)
+        res.json(sell)
+    }
+  })
+})
+  })
 })
 //cargar un producto en concreto
 app.get('/product/:id', (req, res) => {

@@ -179,6 +179,7 @@ app.get("/seler",(req,res)=>{
         DB.query('SELECT * FROM sell WHERE time = ?',[item.time],(err,row)=>{
           if(err){
             console.log(err)
+            res.send(err)
           }else{ 
             row.map((ite,index)=>{
               DB.query('SELECT * FROM products WHERE id = ?',[ite.id_product],(err,roww)=>{

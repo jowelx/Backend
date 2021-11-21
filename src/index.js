@@ -167,6 +167,12 @@ app.get('/',(req, res) => {
 })
 app.get("/seler",(req,res)=>{
   DB.query('SELECT time FROM sell',(err,rows)=>{
+    
+    rows.forEach( (elemento) => {
+      if (!fecha.includes(elemento)) {
+        fecha.push(rows);
+      }
+    });
     res.json(rows)
   })
 })
@@ -176,26 +182,32 @@ app.get("/selled",(req,res)=>{
   const fecha = [];
   DB.query('SELECT time FROM sell',(err,rows)=>{
 
-    fecha.push(rows);
+   
+    rows.forEach( (elemento) => {
+      if (!fecha.includes(elemento)) {
+        fecha.push(rows);
+      }
+    });
+    fecha.forEach( (item) => {
+      DB.query('SELECT * FROM sell WHERE time',[item.time],(err,rows)=>{
 
-    fecha.forEach( (elemento) => {
-  if (!unicos.includes(elemento)) {
-    unicos.push(elemento);
-  }
+        rows.map((item,index) =>{
+          DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, row, fields) => {
+            if(err){
+              console.log(err)
+            }else{
+                sell.push(item.time,[item,row[0].portada])
+                if(index==rows.length-1){
+                  res.json(sell)
+                }
+             
+            }
+          })
+        })
+      })
+
 });
-rows.map((item,index) =>{
-  DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, row, fields) => {
-    if(err){
-      console.log(err)
-    }else{
-        sell.push(item,row[0].portada)
-        if(index==rows.length-1){
-          res.json(sell)
-        }
-     
-    }
-  })
-})
+
   })
 })
 //cargar un producto en concreto

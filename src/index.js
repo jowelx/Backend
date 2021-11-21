@@ -189,12 +189,7 @@ app.get("/selled",(req,res)=>{
   DB.query('SELECT time FROM sell',(err,rows)=>{
 
    
-    rows.forEach( (elemento) => {
-      if (!fecha.includes(elemento)) {
-        fecha.push(rows);
-      }
-    });
-    fecha.forEach( (item) => {
+    
       DB.query('SELECT * FROM sell WHERE time',[item.time],(err,rows)=>{
 
         rows.map((item,index) =>{
@@ -212,7 +207,7 @@ app.get("/selled",(req,res)=>{
         })
       })
 
-});
+
 
   })
 })

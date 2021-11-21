@@ -166,8 +166,9 @@ app.get('/',(req, res) => {
   })
 })
 app.get("/seler",(req,res)=>{
+  const fecha = []; 
   DB.query('SELECT time FROM sell',(err,rows)=>{
-    
+   
     rows.forEach( (elemento) => {
       if (!fecha.includes(elemento)) {
         fecha.push(rows);

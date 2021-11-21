@@ -173,7 +173,7 @@ app.get("/seler",(req,res)=>{
       if (!fecha.includes(elemento)) {
         fecha.push(rows);
         if(index==rows.length-1){
-          res.json(rows)
+          res.json(fecha)
         }
       }
     });

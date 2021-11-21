@@ -175,9 +175,9 @@ rows.map((item,index) =>{
       console.log(err)
     }else{
         sell.push(item,row[0].portada)
-        if(rows.length===index){
+        //if(rows.length===index){
           res.json(sell)
-        }
+        //}
      
     }
   })

@@ -172,16 +172,16 @@ app.get("/seler",(req,res)=>{
   DB.query('SELECT DISTINCT time FROM sell',(err,rows)=>{
   
     
-  rows.map((item,index)=>{
+  rows.map((item,inde)=>{
     DB.query('SELECT * FROM sell WHERE time = ?',[item.time],(err,row)=>{
       if(err){
         console.log(err)
       }else{
        
-        row.map(ite=>{
+        row.map((ite,index)=>{
           DB.query('SELECT portada FROM products WHERE id = ?',[ite.id_product],(err,roww)=>{
             items.push({ite,roww})
-            if(index == rows.length-1){
+            if(index == row.length-1){
               fecha.push({time:item.time,items})
               res.json(fecha)
               }

@@ -32,14 +32,14 @@ app.use(session({
   //10 Hour 
   },
   resave: true,
-  name: ""
+
 }));
 //husg
 //variable de session del usuario
 let name = 'no registrado';
 //varable se sseion de administrador
 let admin = 'sin sesion';
-//settings
+//setting
 app.set('port', process.env.PORT || 4000)
 //middlewares
 app.use(morgan('dev'))
@@ -206,7 +206,7 @@ const fecha=[]
 
   DB.query('SELECT DISTINCT time FROM sell',(err,rows)=>{
    rows.map((item,index)=>{
-    
+  
    
       DB.query('SELECT *  FROM sell WHERE time = ?',[item.time],(err,rowssell)=>{
        
@@ -215,15 +215,10 @@ const fecha=[]
        
         res.json(sell)
       }
-
       
      })
  
    })
-   
- 
-
-
 })
 })
 //cargar un producto en concreto

@@ -169,13 +169,16 @@ app.get('/',(req, res) => {
 app.get("/selled",(req,res)=>{
   const sell =[]
   DB.query('SELECT * FROM sell',(err,rows)=>{
-rows.map(item=>{
-  DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, rows, fields) => {
+rows.map((item,index) =>{
+  DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, row, fields) => {
     if(err){
       console.log(err)
     }else{
-        sell.push(item,rows[0].portada)
-        res.json(sell)
+        sell.push(item,row[0].portada)
+        if(index=== rows.length){
+          res.json(sell)
+        }
+     
     }
   })
 })

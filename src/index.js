@@ -167,7 +167,7 @@ app.get('/',(req, res) => {
 })
 app.get("/seler",(req,res)=>{
   DB.query('SELECT time FROM sell',(err,rows)=>{
-    console.log(rows)
+    res.json(rows)
   })
 })
 //selled

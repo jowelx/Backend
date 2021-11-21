@@ -174,17 +174,18 @@ app.get("/seler",(req,res)=>{
     if(err){
       console.log(err)
     }
+
     else{
-      rows.map((item,inde)=>{
+      rows.map((item,index)=>{
         DB.query('SELECT * FROM sell WHERE time = ?',[item.time],(err,row)=>{
           if(err){
             console.log(err)
-            res.json(err)
+        
           }else{ 
-            row.map((ite,index)=>{
+            row.map((ite,inde)=>{
               DB.query('SELECT * FROM products WHERE id = ?',[ite.id_product],(err,roww)=>{
                 items.push({ite,roww})
-                if(index == row.length-1){
+                if(index === rows.length -1 && inde ==row.length -1){
                   fecha.push({time:item.time,items})
                   res.json(fecha)
                   }
@@ -199,28 +200,31 @@ app.get("/seler",(req,res)=>{
 })
 //selled
 app.get("/selled",(req,res)=>{
-  const sell =[]
-  const fecha = []
-  DB.query('SELECT * FROM sell',(err,rows)=>{
+const sell=[]
+const user=[]
+const fecha=[]
 
-        rows.map((item,index) =>{
-          DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, row, fields) => {
-            if(err){
-              console.log(err)
-            }else{
-           //    sell.push([item,imagen:{portada:row[0].portada}])
-                if(index==rows.length-1){
-                  res.json(sell)
-                }
-             
-            }
-          })
-        })
-      })
+  DB.query('SELECT DISTINCT time FROM sell',(err,rows)=>{
+   rows.map((item,index)=>{
+    
+   
+      DB.query('SELECT *  FROM sell WHERE time = ?',[item.time],(err,rowssell)=>{
+       
+      sell.push({fecha:item,sell: rowssell})
+      if(index == rows.length-1){
+       
+        res.json(sell)
+      }
+
+      
+     })
+ 
+   })
+   
+ 
 
 
-
-
+})
 })
 //cargar un producto en concreto
 app.get('/product/:id', (req, res) => {
@@ -517,6 +521,8 @@ try{
 
             let VALUES={
               user:user,
+              product_name: rows[0].product_name,
+              portada:rows[0].portada,
               id_product:item.id_product,
               amount:item.amount,
               price:rows[0].price,
@@ -534,7 +540,7 @@ if(err){
   res.send({message:'Succesfull payment'})
 }
   })
- 
+
 }
 })
            })

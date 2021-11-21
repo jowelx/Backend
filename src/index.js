@@ -178,7 +178,7 @@ app.get("/seler",(req,res)=>{
       }else{
         items.push(row)
         if(index == rows.length-1){
-        fecha.push(item.time,items)
+        fecha.push({time:item.time,items})
         res.json(fecha)
         }
       }

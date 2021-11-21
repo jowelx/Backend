@@ -170,11 +170,12 @@ app.get("/seler",(req,res)=>{
   DB.query('SELECT time FROM sell',(err,rows)=>{
   
     rows.forEach( (elemento,index) => {
-      res.json(elemento)
+   
       if (!fecha.includes(elemento.time)) {
         fecha.push({tiaaame:elemento.time});
         if(index==rows.length-1){
-         // res.json(fecha)
+          console.log(elemento)
+          res.json(fecha)
         }
       }
     });

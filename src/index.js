@@ -175,7 +175,7 @@ rows.map((item,index) =>{
       console.log(err)
     }else{
         sell.push(item,row[0].portada)
-        if(index=== rows.length){
+        if(index=== rows.length+1){
           res.json(sell)
         }
      

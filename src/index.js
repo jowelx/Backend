@@ -172,11 +172,11 @@ app.get("/seler",(req,res)=>{
   
     
   rows.map((item,index)=>{
-    DB.query('SELECT * FROM sell WHERE time = ?',[item.time],(err,rows)=>{
+    DB.query('SELECT * FROM sell WHERE time = ?',[item.time],(err,row)=>{
       if(err){
         console.log(err)
       }else{
-        items.push(rows)
+        items.push(row)
         if(index == rows.length-1){
         fecha.push(item.time,items)
         res.json(fecha)

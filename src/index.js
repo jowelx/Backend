@@ -185,12 +185,8 @@ app.get("/seler",(req,res)=>{
 //selled
 app.get("/selled",(req,res)=>{
   const sell =[]
-  const fecha = [];
-  DB.query('SELECT time FROM sell',(err,rows)=>{
-
-   
-    
-      DB.query('SELECT * FROM sell WHERE time',[item.time],(err,rows)=>{
+  const fecha = []
+  DB.query('SELECT * FROM sell',(err,rows)=>{
 
         rows.map((item,index) =>{
           DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, row, fields) => {
@@ -209,7 +205,7 @@ app.get("/selled",(req,res)=>{
 
 
 
-  })
+
 })
 //cargar un producto en concreto
 app.get('/product/:id', (req, res) => {

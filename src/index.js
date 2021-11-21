@@ -171,8 +171,8 @@ app.get("/seler",(req,res)=>{
   
     rows.forEach( (elemento,index) => {
    
-      if (!fecha.includes(elemento.time)) {
-        fecha.push(elemento.time);
+      if (!fecha.includes({timee:elemento.time})) {
+        fecha.push({timee:elemento.time});
         if(index==rows.length-1){
           console.log(elemento)
           res.json(fecha)

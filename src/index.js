@@ -169,12 +169,15 @@ app.get("/seler",(req,res)=>{
   const fecha = []; 
   DB.query('SELECT time FROM sell',(err,rows)=>{
    
-    rows.forEach( (elemento) => {
+    rows.forEach( (elemento,index) => {
       if (!fecha.includes(elemento)) {
         fecha.push(rows);
+        if(index==rows.length-1){
+          res.json(rows)
+        }
       }
     });
-    res.json(rows)
+  
   })
 })
 //selled

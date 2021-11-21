@@ -193,7 +193,7 @@ app.get("/selled",(req,res)=>{
             if(err){
               console.log(err)
             }else{
-                sell.push(item,row[0].portada)
+                sell.push(item,{portada:row[0].portada})
                 if(index==rows.length-1){
                   res.json(sell)
                 }

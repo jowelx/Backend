@@ -165,10 +165,24 @@ app.get('/',(req, res) => {
     }
   })
 })
+app.get("/seler",(req,res)=>{
+  DB.query('SELECT time FROM sell',(err,rows)=>{
+    console.log(rows)
+  })
+})
 //selled
 app.get("/selled",(req,res)=>{
   const sell =[]
-  DB.query('SELECT * FROM sell',(err,rows)=>{
+  const fecha = [];
+  DB.query('SELECT time FROM sell',(err,rows)=>{
+
+    fecha.push(rows);
+
+    fecha.forEach( (elemento) => {
+  if (!unicos.includes(elemento)) {
+    unicos.push(elemento);
+  }
+});
 rows.map((item,index) =>{
   DB.query('SELECT * FROM products WHERE id = ?',[item.id_product], (err, row, fields) => {
     if(err){

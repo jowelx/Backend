@@ -167,18 +167,9 @@ app.get('/',(req, res) => {
 })
 app.get("/seler",(req,res)=>{
   const fecha = []; 
-  DB.query('SELECT time FROM sell',(err,rows)=>{
+  DB.query('SELECT DISTINCT time FROM sell',(err,rows)=>{
   
-    rows.forEach( (elemento,index) => {
-   
-      if (!fecha.includes({timee:elemento.time})) {
-        fecha.push({timee:elemento.time});
-        if(index==rows.length-1){
-          console.log(elemento)
-          res.json(fecha)
-        }
-      }
-    });
+    res.json(rows)
   
   })
 })
@@ -193,7 +184,7 @@ app.get("/selled",(req,res)=>{
             if(err){
               console.log(err)
             }else{
-                sell.push([item,{portada:row[0].portada}])
+           //    sell.push([item,imagen:{portada:row[0].portada}])
                 if(index==rows.length-1){
                   res.json(sell)
                 }

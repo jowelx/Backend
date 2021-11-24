@@ -59,7 +59,7 @@ const options ={
 setInterval(function () {
 DB.query('SELECT 1');
 }, 5000);
-app.use(cors(/*options*/));
+app.use(cors(options));
 app.use(express.urlencoded({ limit: '500mb' }));
 //function
 let idIMG
@@ -77,7 +77,6 @@ function uploadFileMultiple() {
   const upload = multer({ storage: storage }).array('image');
   return upload
 }
-
 //routes
 app.get('/comments/:id',async(req,res)=>{
   let id= req.params
@@ -157,6 +156,7 @@ app.post('/updateComments/:id',async(req,res)=>{
 })
 //cargar todos los productos
 app.get('/',(req, res) => {
+
   DB.query('SELECT * FROM products', (err, rows, fields) => {
     if (!err) {
       res.json( rows);
@@ -164,7 +164,8 @@ app.get('/',(req, res) => {
       console.log(err)
     }
   })
-})
+}) 
+//ruta prueba de ventas
 app.get("/seler",(req,res)=>{
   const fecha = []; 
   const items =[]

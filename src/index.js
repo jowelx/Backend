@@ -46,7 +46,7 @@ app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: '500mb' }));
 
-const whitelist =["https://leyla-front.herokuapp.com","byldsc6eg4toh0pgbowc-mysql.services.clever-cloud.com"]
+const whitelist =["https://leyla-front.herokuapp.com","byldsc6eg4toh0pgbowc-mysql.services.clever-cloud.com",""]
 const options ={
   origin:(origin,callback)=>{
     if(whitelist.includes(origin)/*||!origin*/){
@@ -59,7 +59,7 @@ const options ={
 setInterval(function () {
 DB.query('SELECT 1');
 }, 5000);
-app.use(cors(options));
+app.use(cors(/*options*/));
 app.use(express.urlencoded({ limit: '500mb' }));
 //function
 let idIMG
